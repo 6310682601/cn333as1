@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,66 +54,86 @@ class MainActivity : ComponentActivity() {
         setContent {
             Number_Guessing_GameTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     Number_Guessing_Game()
                 }
             }
         }
     }
 }
+
 var hint: String = "Let's play"
 var count: Int = 0
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Number_Guessing_Game() {
     var random by remember { mutableStateOf((1..1000).random()) }
-    var number by remember { mutableStateOf(" ") }
-    val num = number.toIntOrNull()
-    Column (
+    var number by remember { mutableStateOf("") }
+    var hint by remember { mutableStateOf("Let's play") }
+    var count by remember { mutableStateOf(0) }
+    Column(
         Modifier
             .fillMaxSize()
-            .padding(),
+            .padding(0.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
+        Box(Modifier
+            .fillMaxWidth()
+            .background(color = Color(0xFF4A148C))
+        ) {
+            Text(
+                text = "Number Guessing Game",
+                fontSize = 20.sp,
+                color = Color.White,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(15.dp))
         Text(
-            text = "Number Guessing Game",
+            text = "Try to guess the number",
             fontSize = 20.sp,
         )
         Text(
-            text = "Try to guess the number I'm thinking of from 1 - 1000!",
+            text = "I'm thinking of from 1 - 1000!",
             fontSize = 20.sp,
         )
-        Spacer(modifier = Modifier.height(275.dp))
+        Spacer(modifier = Modifier.height(180.dp))
+
         EditNumberField(
             value = number,
             onValueChange = { number = it },
+
         )
-        Spacer(modifier = Modifier.height(275.dp))
+        Spacer(modifier = Modifier.height(180.dp))
         Text(
-            text = hint ,
+            text = hint,
             color = Color.Gray,
             fontSize = 20.sp
-            )
+        )
         Spacer(modifier = Modifier.height(30.dp))
         Row() {
             Button(
                 onClick = {
+                    val num = number.toIntOrNull()
                     if (num != null) {
                         if (num < random) {
-                            hint = "Hint: It's higher!";
+                            hint = "Hint: It's higher!"
                             count += 1;
                         } else if (num > random) {
-                            hint = "Hint: It's lower!";
+                            hint = "Hint: It's lower!"
                             count += 1;
                         } else {
-                            hint = "Correct! use $count time to win";
+                            hint = "Correct! You used $count tries to win"
                         }
+                    } else {
+                        hint = "Invalid input."
                     }
-                    else {
-                        hint = "opop"
-                    }
-                })
-            {
+                }
+            ) {
                 Text(
                     text = "CHECK",
                     fontSize = 20.sp
@@ -119,9 +141,9 @@ fun Number_Guessing_Game() {
             }
             Spacer(modifier = Modifier.width(30.dp))
             Button(onClick = {
-                random = (1..1000).random();
-                number = " ";
-                hint = "Let's play";
+                random = (1..1000).random()
+                number = ""
+                hint = "Let's play"
                 count = 0
             }) {
                 Text(
@@ -134,40 +156,23 @@ fun Number_Guessing_Game() {
     }
 }
 
-//private fun check(num: Int, random: Int){
-//    if (num < random) {
-//        hint = "Hint: It's higher!";
-//        count += 1;
-//    } else if (num > random) {
-//        hint = "Hint: It's lower!";
-//        count += 1;
-//    } else {
-//        hint = "Correct! use $count time to win";
-//    }
-//}
-
-//private fun reset() {
-//    random = (1..1000).random();
-//    number = 0;
-//    hint = "Let's play";
-//    count = 0
-//}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNumberField(
     value: String,
     onValueChange: (String) -> Unit
 ) {
+
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(
-            stringResource(R.string.your_guess),
-            fontSize = 20.sp,
-        ) },
-        modifier = Modifier.fillMaxWidth(),
+        label = {
+            Text(
+                stringResource(R.string.your_guess),
+                fontSize = 20.sp,
+            )
+        },
+        modifier = Modifier.fillMaxWidth().padding(60.dp),
         singleLine = true
     )
 
